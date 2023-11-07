@@ -138,56 +138,37 @@ function profilePage() {
 
   return (
     <DashboardLayout>
-      {open ? (
-        <section className="max-w-md mx-auto mt-8 p-4 bg-white rounded-lg shadow-xl">
-          <h1 className="text-2xl font-semibold text-primary text-center mb-4">
-            User Details
-          </h1>
-          <div className="space-y-4">
-            {user ? (
-              <div>
-                <img
-                  src={user.user.profilePicture}
-                  alt="Profile"
-                  className="w-[60%] h-[25vh] mx-auto rounded-[100%]"
-                />
-              </div>
-            ) : (
-              <NavLink to="/profile" className="text-[#FB7E13]">
-                <HiOutlineUser size={30} />
-              </NavLink>
-            )}
-            <div>
-              <p className="w-full px-4 py-2  rounded-lg bg-gray-100">
-                {user ? user.user.name : "........."}
-              </p>
+      <NavLink className="float-right my-5" to="/dashboard">
+        <FaArrowLeft />
+      </NavLink>
+      <section className="md:flex my-20">
+        <div className=" w-[30%]">
+          {user.profilePicture ? (
+            <img
+              src={user.profilePicture}
+              alt=""
+              className="my-10 mx-auto  w-[50%] md:w-[80%]"
+            />
+          ) : (
+            <img src={image} alt="" className="my-10 w-[50%]" />
+          )}
+          {open ? (
+            <div className="m-2">
+              <input
+                onChange={handleImageUpload}
+                className="my-2 w-[80%]"
+                type="file"
+                accept="image/*"
+              />
             </div>
-            <div>
-              <p className="w-full px-4 py-2  rounded-lg bg-gray-100">
-                {user ? user.user.userName : "........."}
-              </p>
-            </div>
-            <div>
-              <p className="w-full px-4 py-2  rounded-lg bg-gray-100">
-                {user ? user.user.phone : "........."}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={() => setOpen(false)}
-            className="bg-primary text-center text-white hover:bg-[#FB7E13]  transition-all hover:bg-[#FB7E13] transition-transform transform hover:scale-105  flex justify-center gap-[2px] rounded-xl w-full py-4 my-5"
-          >
-            Upadate profile
-          </button>
-        </section>
-      ) : (
-        <section className="max-w-md mx-auto mt-8 p-4 bg-white rounded-lg shadow-xl">
-          <h1 className="text-2xl font-semibold text-secondary text-center mb-4">
-            Profile Update
-          </h1>
-          <form onSubmit={handleProfileUpdate} className="space-y-4">
-            <div>
-              <label className="block text-legend">Name</label>
+          ) : (
+            ""
+          )}
+        </div>
+        {open ? (
+          <form className="my-20" onSubmit={handleSubmit}>
+            <div className="md:flex my-5 gap-2">
+              <label className="font-semibold m-2">Name</label>
               <input
                 type="text"
                 className={`bg-gray-200 rounded-lg py-2 px-3 ${
