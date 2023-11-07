@@ -127,9 +127,9 @@ function profilePage() {
           </div>
           <button
             onClick={() => setOpen(false)}
-            className="bg-primary text-center text-white hover:bg-[#FB7E13]  transition-all hover:bg-[#FB7E13] transition-transform transform hover:scale-105  flex justify-center gap-[2px] rounded-xl w-full py-4 my-5"
+            className="bg-primary text-center text-white transition-all hover:bg-[#FB7E13] transform hover:scale-105  flex justify-center gap-[2px] rounded-xl w-full py-4 my-5"
           >
-            Upadate profile
+            Update profile
           </button>
         </section>
       ) : (

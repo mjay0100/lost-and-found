@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { logoutUser } from "../auth";
 import vector from "../assests/icons/vector.svg";
 import { AiOutlineSearch } from "react-icons/ai";
 import { getUser } from "../auth";
 import { HiOutlineUser, HiOutlineMenu } from "react-icons/hi";
+import { BiSolidDashboard } from "react-icons/bi";
+import { CgSearchFound } from "react-icons/cg";
 const DashboardLayout = ({ children }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const user = getUser();
@@ -49,7 +51,7 @@ const DashboardLayout = ({ children }) => {
         {user.user.profilePicture ? (
           <NavLink to="/profile">
             <img
-              className="w-[60px]  mx-auto h-[55px] border border-[2px] rounded-[100%]"
+              className="w-[60px]  mx-auto h-[55px]  border-[2px] rounded-[100%]"
               src={user.user.profilePicture}
               alt=""
             />
@@ -79,7 +81,7 @@ const DashboardLayout = ({ children }) => {
                     : "flex gap-3 w-full my-5 p-2"
                 }
               >
-                <img src={vector} alt="" /> Dashboard
+                <img src={vector} alt="" /> Dashboardjj
               </NavLink>
             </li>
             <li className="mb-2">
@@ -150,7 +152,7 @@ const DashboardLayout = ({ children }) => {
                     : "flex gap-3 w-full my-5 p-2"
                 }
               >
-                <img src={vector} alt="" /> Dashboard
+                <BiSolidDashboard size={20} /> Dashboardkkk{" "}
               </NavLink>
             </li>
             <li className="mb-2">
@@ -162,7 +164,7 @@ const DashboardLayout = ({ children }) => {
                     : "flex gap-3 w-full my-5 p-2"
                 }
               >
-                <img src={vector} alt="" />
+                <CgSearchFound size={20} />
                 Items Found
               </NavLink>
             </li>
