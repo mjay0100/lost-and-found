@@ -3,8 +3,6 @@ import {
   doc,
   getDoc,
   setDoc, // Change deleteDoc to setDoc
-  addDoc,
-  collection,
   Timestamp,
 } from "firebase/firestore";
 import { firestore } from "../firebase";
@@ -15,9 +13,12 @@ import { getUser } from "../auth";
 import icon from "../assests/icons/location.svg";
 import calender from "../assests/icons/calender.svg";
 import clock from "../assests/icons/clock.svg";
-import rec from "../assests/icons/rec.svg";
 import { FaCheckCircle } from "react-icons/fa";
+import rec from "../assests/icons/rec.svg";
 import connect from "../assests/images/connect.png";
+import { FaArrowLeft } from "react-icons/fa";
+import { NavLink } from "react-router-dom";
+
 function LostItemDetails() {
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,30 +37,30 @@ function LostItemDetails() {
       if (itemDoc.exists()) {
         const itemData = itemDoc.data();
 
-        // Check if the item is already claimed
-        if (itemData.claimed) {
+        // Check if the item is pending
+        if (itemData.claimed === "pending") {
           // Item is already claimed, handle accordingly (e.g., show a message)
-          console.log("Item is already claimed");
+          console.log("Item is pending");
         } else {
           // Item is not claimed, proceed to claim it
 
           // Create a new document in "claimedItems" collection
-          const claimedItemsCollection = collection(firestore, "claimedItems");
+          const claimedItemDocRef = doc(firestore, "claimedItems", id);
           const claimTimestamp = Timestamp.now();
-
           const claimData = {
             ...itemData,
+            claimed: "pending",
+            claimedByUserId: user.userId,
             claimedBy: user.user.name,
             claimedAt: claimTimestamp,
           };
 
-          await addDoc(claimedItemsCollection, claimData);
-
-          // Mark the item as claimed by updating the "claimed" field
-          await setDoc(itemDocRef, { claimed: true }, { merge: true });
+          await setDoc(claimedItemDocRef, claimData);
+          // Mark the item as pending by updating the "claimed" field
+          await setDoc(itemDocRef, { claimed: "pending" }, { merge: true });
 
           // Update the local item data to reflect the claim
-          setItem({ ...itemData, claimed: true });
+          setItem({ ...itemData, claimed: "pending" });
 
           setShowConnectingMessage(true);
 
@@ -83,7 +84,7 @@ function LostItemDetails() {
               // Handle invalid phone number (e.g., show an error message)
               console.log("Invalid phone number");
             }
-          }, 7000);
+          }, 6000);
         }
       }
     } catch (error) {
@@ -113,7 +114,9 @@ function LostItemDetails() {
     <DashboardLayout>
       <div className="container mx-auto text-[#1C1C1C] p-4">
         <h1 className="text-2xl font-semibold mb-4">Item Details</h1>
-
+        <NavLink className="float-right " to="/dashboard">
+          <FaArrowLeft />
+        </NavLink>
         {loading ? (
           <p>Loading...</p>
         ) : item ? (
@@ -124,9 +127,14 @@ function LostItemDetails() {
             </p>
             <p>
               <img src="" alt="" />
-              {item.claimed ? (
+              {item.claimed == "pending" ? (
                 <small className="flex gap-2 ">
-                  <FaCheckCircle size={20} color="#0a032a" /> Claimed
+                  <img src={rec} alt="" /> pending
+                </small>
+              ) : item.claimed === true ? (
+                <small className=" my-1 flex gap-2">
+                  <FaCheckCircle size={15} color="#0a032a" />
+                  Claimed
                 </small>
               ) : (
                 <small className="flex gap-2">
@@ -159,9 +167,13 @@ function LostItemDetails() {
               type="submit"
               className="w-full text-[1.2rem] text-center py-4 bg-primary text-white rounded-md py-2"
               onClick={handleClaimItem}
-              disabled={item.claimed} // Disable the button if the item is claimed
+              disabled={item.claimed == "pending" || item.claimed === true} // Disable the button if the item is claimed
             >
-              {item.claimed ? "Item Claimed" : "Claim Item"}
+              {item.claimed === "pending"
+                ? "Pending Claim"
+                : item.claimed === true
+                ? "Item Claimed"
+                : "Claim Item"}
             </button>
             {showConnectingMessage ? (
               <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/2 py-10 px-5 bg-white rounded-lg shadow-xl md:w-[30%] w-[70%]">

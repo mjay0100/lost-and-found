@@ -9,79 +9,127 @@ import { getUser } from "../auth";
 import { HiOutlineUser } from "react-icons/hi";
 import { loginUser } from "../auth";
 import { auth } from "../firebase";
+import { FaArrowLeft } from "react-icons/fa";
+import { NavLink } from "react-router-dom";
+import image from "../assests/images/upload.png";
 
 function profilePage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  //const [email, setEmail] = useState("");
   const [userName, setUserName] = useState("");
-  const [profilePicture, setProfilePicture] = useState(null);
-  const [open, setOpen] = useState(true);
+  const [profilePicture, setProfilePicture] = useState("");
+  const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const user = getUser();
+  const [nameError, setNameError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
+  const [userNameError, setUserNameError] = useState("");
 
-  const changeEmail = () => {
-    const currUser = auth.currentUser; // Get the current user
-    // Update the email in Firebase Authentication
-    updateEmail(currUser, email)
-      .then(() => {
-        console.log("Email updated successfully in Firebase Authentication");
-      })
-      .catch((error) => {
-        // Handle errors here
-        console.error(error);
-      });
-  };
+  const handleNameChange = (e) => {
+    const nameValue = e.target.value;
+    const nameRegex = /^[A-Za-z ]{3,20}$/;
 
-  const handleProfileUpdate = async (e) => {
-    setLoading(true);
-    e.preventDefault();
-
-    if (!name || !phone || !userName) {
-      console.log("All fields are required.");
-      return;
+    if (nameRegex.test(nameValue)) {
+      setNameError("");
+    } else {
+      setNameError("Name must be 3-20 letters with no special characters");
     }
 
-    try {
-      if (user) {
-        const userDocRef = doc(firestore, "users", user.userId);
-        const updatedUserData = {
-          name: name,
-          userName: userName,
-          phone: phone,
-        };
-        const storage = getStorage();
-        // Check if a new profile picture is selected
-        if (profilePicture) {
-          // Create a reference to the user's profile picture in Firebase Storage
-          const storageRef = ref(storage, `profilePictures/${user.userId}`);
+    setName(nameValue);
+  };
+  const handlePhoneChange = (e) => {
+    const phoneValue = e.target.value;
+    const phoneRegex = /^[0-9]{11}$/;
 
-          // Upload the new profile picture
-          await uploadBytes(storageRef, profilePicture);
+    if (phoneRegex.test(phoneValue)) {
+      setPhoneError("");
+    } else {
+      setPhoneError("Phone number must be 11 digits");
+    }
 
-          // Get the download URL of the uploaded profile picture
-          const downloadURL = await getDownloadURL(storageRef);
+    setPhone(phoneValue);
+  };
 
-          // Add the profile picture URL to the updated user data
+  const handleUserNameChange = (e) => {
+    const userNameValue = e.target.value;
+    const userNameRegex = /^[A-Za-z0-9_]{1,12}$/;
+
+    if (userNameRegex.test(userNameValue)) {
+      setUserNameError("");
+    } else {
+      setUserNameError("Username must be up to 12 characters with no spaces");
+    }
+
+    setUserName(userNameValue);
+  };
+
+  const { user } = getUser();
+  const { userId } = getUser();
+  const { userAuth } = getUser();
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfilePicture(file);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!user) {
+      console.log("User not found. Please log in.");
+      return;
+    }
+    const updatedUserData = {};
+    const userDocRef = doc(firestore, "users", userId);
+
+    if (name !== "") {
+      updatedUserData.name = name;
+    } else {
+      updatedUserData.name = user.name;
+    }
+
+    if (userName !== "") {
+      updatedUserData.userName = userName;
+    } else {
+      updatedUserData.userName = user.userName;
+    }
+    if (phone !== "") {
+      updatedUserData.phone = phone;
+    } else {
+      updatedUserData.phone = user.phone;
+    }
+    if (profilePicture == "" || profilePicture == null) {
+      updatedUserData.profilePicture = user.profilePicture;
+    }
+
+    if (profilePicture) {
+      const storage = getStorage();
+      const storageRef = ref(storage, `profilePictures/${userId}`);
+      try {
+        const snapshot = await uploadBytes(storageRef, profilePicture);
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        if (profilePicture !== "") {
           updatedUserData.profilePicture = downloadURL;
+        } else {
+          updatedUserData.profilePicture = user.profilePicture;
         }
 
-        // Update the user data in Firestore
-        await setDoc(userDocRef, updatedUserData, { merge: true });
-        //changeEmail();
-        loginUser(updatedUserData, user.userId, user.userAuth);
         console.log("updated");
-        setLoading(false);
-        // Clear the form fields
-        setName("");
-        setPhone("");
-        setUserName("");
-        setProfilePicture(null);
-        // Redirect to the user's profile page or a success page
-        setOpen(true);
-      } else {
-        console.log("User not found. Please log in.");
+      } catch (error) {
+        console.log("Error uploading image", error);
       }
+    }
+    try {
+      await setDoc(userDocRef, updatedUserData, { merge: true });
+      loginUser(updatedUserData, userId, userAuth);
+      console.log("Updated");
+      setOpen(false);
+      // Clear  form fields
+      setName("");
+      setPhone("");
+      setUserName("");
     } catch (error) {
       console.log("Error updating the user profile. Please try again.");
       console.log("Error updating profile:", error);
@@ -127,9 +175,9 @@ function profilePage() {
           </div>
           <button
             onClick={() => setOpen(false)}
-            className="bg-primary text-center text-white transition-all hover:bg-[#FB7E13] transform hover:scale-105  flex justify-center gap-[2px] rounded-xl w-full py-4 my-5"
+            className="bg-primary text-center text-white hover:bg-[#FB7E13]  transition-all hover:bg-[#FB7E13] transition-transform transform hover:scale-105  flex justify-center gap-[2px] rounded-xl w-full py-4 my-5"
           >
-            Update profile
+            Upadate profile
           </button>
         </section>
       ) : (
@@ -142,55 +190,94 @@ function profilePage() {
               <label className="block text-legend">Name</label>
               <input
                 type="text"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary"
+                className={`bg-gray-200 rounded-lg py-2 px-3 ${
+                  nameError ? "border-red-500" : ""
+                }`}
+                placeholder={user.name}
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={handleNameChange}
               />
+              {nameError && <p className="text-red-500">{nameError}</p>}
             </div>
-            <div>
-              <label className="block text-legend">UserName</label>
+            <div className="md:flex my-5 gap-2">
+              <label className="font-semibold m-2">Phone</label>
               <input
-                type="text"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="block text-legend">Phone</label>
-              <input
-                type="text"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary"
+                className={`bg-gray-200 rounded-lg py-2 px-3 ${
+                  phoneError ? "border-red-500" : ""
+                }`}
+                type="phone"
+                placeholder={user.phone}
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={handlePhoneChange}
               />
+              {phoneError && <p className="text-red-500">{phoneError}</p>}
             </div>
-            {/* <div>
-              <label className="block text-legend">Email</label>
+            <div className="md:flex my-5 gap-2">
+              <label className="font-semibold m-2">UserName</label>
               <input
-                type="email"
-                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-primary"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                className={`bg-gray-200 rounded-lg py-2 px-3 ${
+                  userNameError ? "border-red-500" : ""
+                }`}
+                type="text"
+                placeholder={user.userName ? user.userName : "enter userName"}
+                value={userName}
+                onChange={handleUserNameChange}
               />
-            </div> */}
-            <div>
-              <label className="block text-legend">Profile Picture</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setProfilePicture(e.target.files[0])}
-              />
+              {userNameError && <p className="text-red-500">{userNameError}</p>}
             </div>
-            <button
-              className="w-full py-3 bg-primary text-white rounded-md hover:bg-[#FB7E13] transition-all"
-              type="submit"
-            >
-              {loading ? "Updating" : " Update Profile"}
-            </button>
+            <div className="flex block my-5 md:gap-5">
+              <button
+                className="w-[40%] block my-2 mx-auto text-center bg-primary text-white  transition-all hover:bg-[#FB7E13] transform hover:scale-105 rounded-xl py-4 my-5 p-5"
+                type="submit"
+              >
+                Save
+              </button>
+              <button
+                className="w-[40%] block text-center mx-auto bg-[#FB7E13] text-white  transition-all hover:bg-primary transform hover:scale-105 rounded-xl py-4 my-5 p-5"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setOpen(false);
+                }}
+                type="submit"
+              >
+                Cancel
+              </button>
+            </div>
           </form>
-        </section>
-      )}
+        ) : (
+          <div className="my-10  w-[70%]">
+            <div className="my-3 text-secondary">
+              <h3 className="font-bold my-1">Name</h3>
+              <p>{user.name}</p>
+            </div>
+            <div className="lowercase my-3 text-secondary">
+              <h3 className="font-bold my-1">Email</h3>
+              <p>{userAuth.email}</p>
+            </div>
+            <div className="my-3 text-secondary">
+              <h3 className="font-bold my-1"> Phone</h3>
+              <p>{user.phone}</p>
+            </div>
+            {user.userName ? (
+              <div className="my-3 text-secondary">
+                <h3 className="font-bold my-1">UserName</h3>
+                <p>{user.userName}</p>
+              </div>
+            ) : (
+              ""
+            )}
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                setOpen(true);
+              }}
+              className=" md:w-full text-center bg-primary text-white  transition-all hover:bg-[#FB7E13]/80  transform hover:scale-105  flex justify-center gap-1 rounded-xl w-[50%] my-5 py-5"
+            >
+              Edit Profile
+            </button>
+          </div>
+        )}
+      </section>
     </DashboardLayout>
   );
 }

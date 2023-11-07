@@ -86,7 +86,7 @@ function Stats() {
   const totalItemsPercentage = 100;
 
   return (
-    <div className="bg-white shadow-lg shadow-slate-300 w-[90%] text-center mx-auto ">
+    <div className="bg-white shadow-lg shadow-slate-300 w-[90%] md:w-[60%] text-center mx-auto ">
       {loading ? (
         <div className="text-center p-4 text-black">
           <div className="loader"></div>
@@ -101,7 +101,7 @@ function Stats() {
             Last 30 Days
           </p>
           {/* graph for items */}
-          <div className="w-[50%] md:w-[35%] mx-auto">
+          <div className="w-[60%] md:w-[35%] mx-auto">
             <canvas height={200} id="statisticsChart"></canvas>
           </div>
           {/* Adjusted the height */}

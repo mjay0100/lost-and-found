@@ -7,7 +7,7 @@ const Footer = () => {
       <div className="bg-[#060218] text-white py-5  mt-12">
         <div className="block w-[90%]  mx-auto md:flex justify-between mb-4">
           <div>
-            <h2 className="font-bold mb-10">Lost&Found Hub</h2>
+            <h2 className="font-bold mb-10">ReclaimHub</h2>
             <ul className="grid gap-4">
               <li>About us</li>
               <li>Investors</li>
@@ -22,7 +22,7 @@ const Footer = () => {
             <div className="block md:flex items-center gap-3">
               <input
                 type="text"
-                className=" bg-transparent border-2 px-4 py-2 border-solid border-white rounded-md"
+                className=" bg-transparent border-2 px-4 py-2 border-solid my-5 border-white rounded-md"
                 placeholder="Your Email"
               />
               <button className="bg-white text-black p-3 rounded-md">

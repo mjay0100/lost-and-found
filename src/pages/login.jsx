@@ -11,6 +11,7 @@ function Login() {
   // State variables for email, password, and error message
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
@@ -18,10 +19,12 @@ function Login() {
   // Function to handle user login
   const handleLogin = async (e) => {
     e.preventDefault(); // Prevent the default form submission
-
+    setLoading(true);
     // Basic form validation
     if (!email || !password) {
+      setLoading(false);
       setError("Email and password are required.");
+
       return;
     }
 
@@ -46,6 +49,7 @@ function Login() {
         console.error("User document not found in Firestore.");
       }
       // redirect the user
+      setLoading(false);
       navigate("/dashboard");
     } catch (error) {
       setError("Invalid email or password. Please try again.");
@@ -71,13 +75,15 @@ function Login() {
             )}
 
             {/* Email Input */}
+
             <fieldset className="border border-border p-1 my-4 rounded-lg">
               <legend className="block text-legend p-2">Email</legend>
+
               <div className="mb-4">
                 <input
                   type="email"
                   id="email"
-                  className="w-full px-5 border-none outline-none"
+                  className="w-full px-2 border-none outline-none"
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -88,11 +94,12 @@ function Login() {
             {/* Password Input */}
             <fieldset className="border border-border p-1 my-4 rounded-lg">
               <legend className="block text-legend p-2">Password</legend>
+
               <div className="mb-4">
                 <input
                   type="password"
                   id="password"
-                  className="w-full px-5 border-none outline-none"
+                  className="w-full px-2 border-none outline-none"
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -103,9 +110,9 @@ function Login() {
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full p-2 bg-primary text-white rounded-md py-2"
+              className="w-full py-4 mt-5 bg-primary text-white rounded-md "
             >
-              Login
+              {loading ? "Loging in please wait..." : "Login"}
             </button>
           </form>
 

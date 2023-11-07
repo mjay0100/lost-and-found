@@ -51,6 +51,7 @@ const DashboardLayout = ({ children }) => {
         {user.user.profilePicture ? (
           <NavLink to="/profile">
             <img
+              className="w-[65px]  mx-auto h-[65px] border border-[2px] rounded-[100%]"
               className="w-[60px]  mx-auto h-[55px]  border-[2px] rounded-[100%]"
               src={user.user.profilePicture}
               alt=""
@@ -69,7 +70,7 @@ const DashboardLayout = ({ children }) => {
         <div
           className={`${
             isSidebarOpen ? "left-0 md:left-0 " : "left-[-80%] md:left-0"
-          } block md:hidden my-2 mx-2 bg-white w-[65%] h-[60vh] rounded-xl  font-400 text-[16px] absolute transition-transform ease-in-out duration-300`}
+          } block md:hidden my-2 mx-2 bg-white w-[65%] h-[60vh] rounded-xl  font-400 text-[16px] absolute transition-transform ease-in-out duration-300 z-10`}
         >
           <ul>
             <li className="mb-2">
@@ -107,6 +108,19 @@ const DashboardLayout = ({ children }) => {
                 }
               >
                 <img src={vector} alt="" /> Report Lost Item
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/markItem"
+                className={({ isActive }) =>
+                  isActive
+                    ? "flex gap-3 w-full p-2  border-l-[#FB7E13] border-l-2 bg-[#FFF5E5] text-[#FB7E13] font-bold my-5"
+                    : "flex gap-3 w-full my-5 p-2"
+                }
+              >
+                <img src={vector} alt="" />
+                reported Items
               </NavLink>
             </li>
             <li>
@@ -152,7 +166,7 @@ const DashboardLayout = ({ children }) => {
                     : "flex gap-3 w-full my-5 p-2"
                 }
               >
-                <BiSolidDashboard size={20} /> Dashboardkkk{" "}
+                <img src={vector} alt="" /> Dashboard
               </NavLink>
             </li>
             <li className="mb-2">
@@ -178,6 +192,18 @@ const DashboardLayout = ({ children }) => {
                 }
               >
                 <img src={vector} alt="" /> Report Lost Item
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/markItem"
+                className={({ isActive }) =>
+                  isActive
+                    ? "flex gap-3 w-full p-2 bg-[#50898926] text-[#1C1C1CF7] font-bold my-5"
+                    : "flex gap-3 w-full my-5 p-2"
+                }
+              >
+                <img src={vector} alt="" /> Reported Items
               </NavLink>
             </li>
             <li>
@@ -209,7 +235,7 @@ const DashboardLayout = ({ children }) => {
           </ul>
         </div>
         {/* Main Content */}
-        <div className="bg-[#FFFFFF] p-3  w-[100%]">{children}</div>
+        <div className="bg-[#FFFFFF] p-1 w-[100%]">{children}</div>
       </div>
     </main>
   );
